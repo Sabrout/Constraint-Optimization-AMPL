@@ -1,0 +1,21 @@
+set FullGrade := ComputerVision MachineLearning DataMining Optimization ;
+set MyGrade := Project Report MidtermExam FinalExam;
+param n_percent :
+Project Report MidtermExam FinalExam :=
+ComputerVision 30 40 20 10
+MachineLearning 20 65 15 0
+DataMining 40 35 5 20
+Optimization 25 40 30 5 ;
+
+param work :=
+ComputerVision 70 MachineLearning 40 DataMining 60 Optimization 80 ;
+param u_FullGrade :=
+ComputerVision 25 MachineLearning 20 DataMining 100 Optimization 100 ;
+param l_FullGrade :=
+ComputerVision 10 MachineLearning 0 DataMining 30 Optimization 0 ;
+param u_MyGrade :=
+Project 100 Report 50
+MidtermExam 100 FinalExam 13 ;
+param l_MyGrade :=
+Project 0 Report 0
+MidtermExam 18 FinalExam 8 ;
