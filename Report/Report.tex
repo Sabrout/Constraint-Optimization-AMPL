@@ -37,6 +37,9 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{subcaption}
 
 \begin{document}
 
@@ -110,14 +113,33 @@ This document represents a report on the outcomings of a practical session in th
 
 \section{Introduction}
 
-Your introduction goes here! Some examples of commonly used commands and features are listed below, to help you get started.
+During studying mathematical optimization and constrained problems, it is natural to seek software to be able to solve real-world optimization problems in a practical and specialized technique. Thus, we use AMPL in our solution through out this report to solve the provided problems in the practical session PDF document.
 
-If you have a question, please use the support box in the bottom right of the screen to get in touch. 
+In order to run our implementation, only a free-demo of the AMPL's IDE software solution is enough accompanied with our files available on the GitHub repository in the following link: \\
+\url{https://github.com/Sabrout/Constraint-Optimization-AMPL}
 
-\section{Some \LaTeX{} Examples}
-\label{sec:examples}
+To run our code, follow the following steps by executing them in the AMPL console:
+\begin{enumerate}
+	\item Load the model file corresponding to the problem number by typing \texttt{model <filename>;}
+	\item Load the data file corresponding to the problem number by typing  \texttt{data <filename>;} (if applicable)
+	\item Solve the current problem by typing \texttt{solve;}
+	\item View the solution by typing \texttt{display <Variable Name>}
+\end{enumerate}
+\section{Unconstrained optimization}
+\subsection{Problem 1}
+\subsection{Problem 2}
+\subsection{Problem 3}
 
-\subsection{Sections}
+\section{Modeling constrained problems}
+\subsection{Water resources}
+\subsection{Good-smelling perfume design}
+\subsection{ Roadway expenses}
+\subsubsection{Rural/Urban case}
+\subsubsection{General case}
+\subsection{Design you own optimization problem}
+\section{Data Analysis}
+
+\section{Sections}
 
 Use section and subsection commands to organize your document. \LaTeX{} handles all the formatting and numbering automatically. Use ref and label commands for cross-references.
 
