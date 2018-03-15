@@ -40,6 +40,7 @@
 \usepackage{url}
 \usepackage{listings}
 \usepackage{subcaption}
+\usepackage{tabu}
 
 \begin{document}
 
@@ -125,72 +126,226 @@ To run our code, follow the following steps by executing them in the AMPL consol
 	\item Solve the current problem by typing \texttt{solve;}
 	\item View the solution by typing \texttt{display <Variable Name>}
 \end{enumerate}
+
 \section{Unconstrained optimization}
 \subsection{Problem 1}
 \subsection{Problem 2}
 \subsection{Problem 3}
 
 \section{Modeling constrained problems}
+We now focus on modeling some kind of “real” problems.
 \subsection{Water resources}
+In order to solve the water resources problem, we need to introduce two variables that will be provide the solution later which is the amount of consumption of water sources. Those variables are ``r'' for the reservoir source of water and ``s'' for the stream source. The model is implemented as the following:
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+
+var r >= 0;
+var s >= 0;
+
+minimize f: 100*r + 50*s;
+subject to c1: s <= 100;
+subject to c2: 50*r + 250*s <= 100*(r+s);
+subject to c3: r+s >= 500;
+\end{verbatim}
+As indicated in the code, there are three constraints presented. The first constraint states the maximum limit of water used from the stream. Following a second constraint that limits the pollution to the standards accepted by the city so it will not exceed 100 ppm. The third constraint assures the basic needs of the city of 500,000 liters of water per day.
+
+The resulting solution by the LOQO solver in AMPL is that \texttt{r = 400} and \texttt{s = 100} which means that we should get 400,000 liters from the reservoir and 100,000 liters from the stream.
+
 \subsection{Good-smelling perfume design}
-\subsection{ Roadway expenses}
+To solve the prefume design problem, we introduce four variables for the proportions of the four blends to be ``b1'', ``b2'', ``b3'' and ``b4'' respectively. The model is implemented as the following:
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+
+var b1 >= 0;
+var b2 >= 0;
+var b3 >= 0;
+var b4 >= 0;
+
+minimize f: 55*b1 + 65*b2 + 35*b3 + 85*b4;
+
+subject to c0: b1+b2+b3+b4 = 1;
+subject to c1: 0.05 <= b2 <= 0.2;
+subject to c2: b3 >= 0.3;
+subject to c3: 0.1 <= b1 <= 0.25;
+subject to c4: 0.35*b1 + 0.6*b2 + 0.35*b3 + 0.4*b4 <= 0.5;
+subject to c5: 0.08 <= 0.15*b1 + 0.05*b2 + 0.2*b3 + 0.1*b4 <= 0.13;
+subject to c6: 0.3*b1 + 0.2*b2 + 0.4*b3 + 0.2*b4 <= 0.35;
+subject to c7: 0.2*b1 + 0.15*b2 + 0.05*b3 + 0.3*b4 >= 0.19;
+\end{verbatim}
+There are eight constraints used for the model. The first one basic as it indicates that all the proportions of the blends are percentages so they must add to 100. Next, the following three constraints limit those proportions of the blends. Then, the four constraints after that are limiting the usages of essences of real flowers in the blends that are forming our new wanted blend.
+
+The solution using the LOQO solver in AMPL is that \texttt{b1 = 0.14}, \texttt{b2 = 0.14}, \texttt{b3 = 0.3} and \texttt{b4 = 0.42}. This means to prepare the product with 14\%, 14\%, 30\% and 42\% in order for the four blends.
+
+\subsection{Roadway expenses}
 \subsubsection{Rural/Urban case}
+In order to solve the Roadway expenses problem, we need to introduce two variables that will be provide the solution later which is the amount of cost for rural areas and the cost for urban areas. Those variables are ``xr'' for the reservoir source of water and ``xu'' representing those two costs. The model is implemented as the following:
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+
+var xu >= 0;
+var xr >= 0;
+
+maximize f: (7000*log(1 + xr)) + (5000*log(1 + xu)) - xr - xu;
+subject to c1: xu + xr <= 200;
+\end{verbatim}
+As indicated in the code, there is only one constraint to limit the expenses to 200 million euros. The benefit function is maximized to meet this upper bound.
+
+The resulting solution by the LOQO solver in AMPL is that \texttt{xu = 83.1667} and \texttt{xr = 116.833} which means that we should spend 83 million euros on urban areas and 116.8 millions on rural areas.
+
 \subsubsection{General case}
+This part of the session is dependent on the previous part as we are trying to solve the same problem in a more dynamic manner with expanding the set of categories to be more than boolean if rural or urban. In this case, the number of variables to provide the solution is dependent on the number of categories put in the data file and it represented by a set named ``x'' that will show the solution later. The model file is written as the following:
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+
+set items;
+var x{i in items};
+param C{i in items};
+param budget;
+
+maximize f: sum{i in items} (C[i]*log(1 + x[i]) - x[i]);
+subject to c: sum{i in items} (x[i]) <= budget;
+\end{verbatim}
+For such a case, we prepared to data files to test the model. The first one is \texttt{prob\_3\_3\_2(old).dat} to solve the same problem again as in the Rural/Urban case and check whether we will have the same results. The data file is written like the following:
+
+\begin{verbatim}
+set items := rural urban;
+param C := rural 7000 urban 5000;
+param budget := 200;
+\end{verbatim}
+
+After executing the model and the data file, it provides the same answer as before which indicates that the dynamic approach we selected is working successfully and provides the same answers as before. Another part of the question requires adding a third category in the set to test how dynamic is our model. Thus, we created another data file named \texttt{prob\_3\_3\_2.dat} that is written to add the suburban category as the following:
+
+\begin{verbatim}
+set items := rural urban suburban;
+param C := rural 7000 urban 5000 suburban 7000;
+param budget := 200;
+\end{verbatim}
+The result of such data is \texttt{rural  73.7895}, \texttt{suburban  73.7895} and \texttt{urban  52.4211}. Hence, France should spend 73.7 million euros on roadway improvements on rural areas, equally on suburban areas and 52.4 millions on urban areas.
+
+
 \subsection{Design you own optimization problem}
+Since this part is dedicated to designing our own optimization problem, we chose it to be expressive of a relative issue to our lives as students in the current time being which is maximizing our efficiency in studying, working and succeeding in our courses. Hence, we decided to propose a problem with multiple courses, grading schemes and working hours that are completely dynamic so they can fit every student's needs. Then, solving the optimization problem provides percentages of the student's total time so he or she can prioritize their course list and make the process as efficient as possible. 
+
+The structure of such problem is that we have four courses for the semester which are Computer Vision, Machine Learning, Data Mining and Optimization. Each course has a grading scheme which is divided into four duties such as a project, a report, a midterm exam and a final exam. The percentages of each duty with respect to the total grade differs from one course to another. Finally, we have the number of working hours that the student can afford for every course. The following table shows our problem.
+\begin{center}
+	\begin{tabu} to 0.95\textwidth { |X[c]|X[c]X[c]X[c]X[c]| }
+		\hline
+		Course & Computer Vision & Machine Learning & Data Mining & Optimization \\
+		\hline
+		Final Exam & 30 & 20 & 40 & 25 \\
+		Midterm & 40 & 65 & 35 & 40 \\
+		Project & 20 & 15 & 5 & 30 \\
+		Report & 10 & 0 & 20 & 5 \\
+		\hline
+		Hours & 70 & 40 & 60 & 80 \\
+		\hline
+	\end{tabu}
+\end{center}
+There are some constraints on the grades which will assume that the student is not aiming for the full grade for every course because ot the time limitations and the student's history of grades, scientific interest and curiosity, understanding of the teaching material and motivation and energy to work. For the machine learning course, the student is not willing to dedicate more than 20\% of his time. However, he must dedicate more than 30\% of his time to Data Mining in order to pass. Also, the student has some experience in Computer Vision so he only needs to dedicate from 10\% to 25\% of his time to it. \\
+Moreover, practical parts are important for the student so the project parts of all courses can not be less than 18\% in total. As the reports are essential for a good academic profile, reports must occupy between 8\% and 13\% of the total time. Finally, midterm exams secure a great part of the total grade but it can take over other duties, so studying for midterms must occupy 50\% at most of his or her time. \\
+To solve the problem, we must find the least time consuming way of studying and working to make the student pass the semester with respect to his other concerns as provided before.
+\subsubsection{Problem Formalization}
+The decision variables are: \\
+\[x_j = \text{Percent of time spent on a course in the semester, } j = 1\text{ to }4\]
+The model is: \\
+\[\text{Minimize time = } 70x_1 + 40x_2 + 60x_3 + 80x_4\]
+subject to
+\[x_1 + x_2 + x_3 + x_ 4 = 100\]
+\[x_2 \leq 20, \text{{ }}x_3 \geq 30\]
+\[10 \leq x_1 \leq 25\]
+\[0.2x_1 + 0.15x_2 + 0.05x_3 + 0.3x_4 \geq 18 \]
+\[8 \leq 0.1x_1 + 0.2x_3 + 0.05x_4 \leq 13 \]
+\[0.4x_1 + 0.65x_2 + 0.35x_3 + 0.4x_4 \leq 50 \]
+\[x_j \geq 0 \text{ for all } j = 1\text{ to }4 \]
+
+\subsubsection{Model and Data}
+According to the formalized problem, we implemented a model in the file \texttt{prob\_4\_3.mod} that fits the mathematical representation of the problem as the following:
+
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+
+
+set FullGrade; # set of FullGrades
+set MyGrade; # set of MyGradess
+param n_percent{FullGrade,MyGrade}>=0;
+# percentage of MyGrade to FullGrade
+param work{FullGrade}>=0;
+# hours for full grades
+param u_FullGrade{FullGrade}>=0;
+# upper bound for the percentage of each FullGrade in semester
+param l_FullGrade{FullGrade}>=0;
+# lower bound for the percentage of each FullGrade in semester
+param u_MyGrade{MyGrade} >=0;
+# upper bound for the percentage of each MyGrade in semester
+param l_MyGrade{MyGrade} >=0;
+# lower bound for the percentage of each MyGrade in semester
+var WorkDivision{FullGrade}>=0;
+# percentage of each CourseWork in semester
+minimize Total_work:
+sum{i in FullGrade} work[i]*WorkDivision[i];
+subject to Work: sum{i in FullGrade} WorkDivision[i] = 100;
+# total percentage should be 100%
+subject to FullGrade_u{i in FullGrade}: 
+WorkDivision[i] <= u_FullGrade[i];
+# FullGrade percentage <= upper bound
+subject to FullGrade_l{i in FullGrade}: 
+WorkDivision[i] >= l_FullGrade[i];
+# FullGrade percentage >= lower bound
+subject to MyGrade_u{j in MyGrade}: 
+sum {i in FullGrade} WorkDivision[i] 
+* n_percent[i,j] / 100 <= u_MyGrade[j];
+# MyGrades percentage <= upper bound
+subject to MyGrade_l{j in MyGrade}: 
+sum {i in FullGrade} WorkDivision[i] 
+* n_percent[i,j] /100 >= l_MyGrade[j];
+# MyGrades percentage >= lower bound
+\end{verbatim}
+The model has comments explaining every step along the way. In addition, we implemented also the data file in order for the model to function in the file \texttt{prob\_4\_3.dat}. It is as follows:
+\begin{verbatim}
+set FullGrade := ComputerVision MachineLearning DataMining Optimization ;
+set MyGrade := FinalExam MidtermExam Project Report;
+param n_percent :
+FinalExam MidtermExam Project Report :=
+ComputerVision 30 40 20 10
+MachineLearning 20 65 15 0
+DataMining 40 35 5 20
+Optimization 25 40 30 5 ;
+
+param work :=
+ComputerVision 70 MachineLearning 40 DataMining 60 Optimization 80 ;
+param u_FullGrade :=
+ComputerVision 25 MachineLearning 20 DataMining 100 Optimization 100 ;
+param l_FullGrade :=
+ComputerVision 10 MachineLearning 0 DataMining 30 Optimization 0 ;
+param u_MyGrade :=
+FinalExam 100 MidtermExam 50
+Project 100 Report 13 ;
+param l_MyGrade :=
+FinalExam 0 MidtermExam 0
+Project 18 Report 8 ;
+\end{verbatim}
+After executing the file and solving the problem, we displayed the key variables in the console to find that :
+\begin{verbatim}
+WorkDivision [*] :=
+ComputerVision  15
+DataMining  30
+MachineLearning  20
+Optimization  35
+;
+\end{verbatim}
+Hence, the student should dedicate 15\% of his or her time to the Computer Vision course, 30\% to Data Mining, 20\% to Machine Learning and 35\% to the Optimization course. Of course this solution does not guarantee the highest grades possible for a student, it just shows the best possible grades given a limited time frame. 
 \section{Data Analysis}
 
-\section{Sections}
-
-Use section and subsection commands to organize your document. \LaTeX{} handles all the formatting and numbering automatically. Use ref and label commands for cross-references.
-
-\subsection{Comments}
-
-Comments can be added to the margins of the document using the \todo{Here's a comment in the margin!} todo command, as shown in the example on the right. You can also add inline comments too:
-
-\todo[inline, color=green!40]{This is an inline comment.}
-
-\subsection{Tables and Figures}
-
-Use the table and tabular commands for basic tables --- see Table~\ref{tab:widgets}, for example. You can upload a figure (JPEG, PNG or PDF) using the files menu. To include it in your document, use the includegraphics command as in the code for Figure~\ref{fig:frog} below.
-
-% Commands to include a figure:
-\begin{figure}
-\centering
-\includegraphics[width=0.5\textwidth]{frog.jpg}
-\caption{\label{fig:frog}This is a figure caption.}
-\end{figure}
-
-\begin{table}
-\centering
-\begin{tabular}{l|r}
-Item & Quantity \\\hline
-Widgets & 42 \\
-Gadgets & 13
-\end{tabular}
-\caption{\label{tab:widgets}An example table.}
-\end{table}
-
-\subsection{Mathematics}
-
-\LaTeX{} is great at typesetting mathematics. Let $X_1, X_2, \ldots, X_n$ be a sequence of independent and identically distributed random variables with $\text{E}[X_i] = \mu$ and $\text{Var}[X_i] = \sigma^2 < \infty$, and let
-$$S_n = \frac{X_1 + X_2 + \cdots + X_n}{n}
-      = \frac{1}{n}\sum_{i}^{n} X_i$$
-denote their mean. Then as $n$ approaches infinity, the random variables $\sqrt{n}(S_n - \mu)$ converge in distribution to a normal $\mathcal{N}(0, \sigma^2)$.
-
-\subsection{Lists}
-
-You can make lists with automatic numbering \dots
-
-\begin{enumerate}
-\item Like this,
-\item and like this.
-\end{enumerate}
-\dots or bullet points \dots
-\begin{itemize}
-\item Like this,
-\item and like this.
-\end{itemize}
-
-We hope you find write\LaTeX\ useful, and please let us know if you have any feedback using the help menu above.
+\section{Conclusion}
 
 \end{document}
