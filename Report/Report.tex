@@ -129,8 +129,112 @@ To run our code, follow the following steps by executing them in the AMPL consol
 
 \section{Unconstrained optimization}
 \subsection{Problem 1}
+The following problem entailed solving for the equation below:
+
+\begin{equation*}
+\begin{aligned}
+& \underset{x_1,x_2}{\text{min}}
+& & 4x_1^2 + 7(x_2 - 4)^2 - 3x_1 + 4x_2 \\ 
+\end{aligned}
+\end{equation*}
+
+The above equation can be modeled as the following in the AMPL solver:
+
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+var x1 >= 0;
+var x2 >= 0;
+
+minimize f: 4*(x1)^2 + 7*(x2-4)^2 - 3*x1 + 4*x2;
+
+solve;
+display x1;
+display x2;
+\end{verbatim}
+
+The resulting solution by the LOQO solver in AMPL is that \texttt{x1 = 0.375} and \texttt{x2 = 3.71429} . This was verified by differentiating the equation with respect to x1 and x2 to arrive at the solution output by the solver.
+
+
 \subsection{Problem 2}
+
+The following problem entailed solving for the equation below:
+
+\begin{equation*}
+\begin{aligned}
+& \underset{x_1,x_2}{\text{min}}
+& & (1 - x_1)^2 + 100(x_2 - x_1^2)^2  \\ 
+\end{aligned}
+\end{equation*}
+
+The above equation can be modeled as the following in the AMPL solver:
+
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+var x1 >= 0;
+var x2 >= 0;
+let x1 := 1;   # tested for different values of x1
+let x2 := -1;  # tested for different values of x2
+
+minimize f: (1-x1)^2 + 100*(x2-(x1)^2)^2;
+
+solve;
+display x1;
+display x2;
+\end{verbatim}
+
+The problem equation was run four times with different starting values for \texttt{x1} and \texttt{x2} and the results were tabulated as seen below:
+
+\begin{center}
+	\begin{tabu} to 0.95\textwidth { |X[c]|X[c]X[c]X[c]X[c]| }
+		\hline
+		Parameters & Iteration 1 & Iteration 2 & Iteration 3 & Iteration 4 \\
+		\hline
+		Initialized X1 & 0 & 1 & 5 & 10 \\
+		Initialized X2 & 0 & 1 & 5 & 10 \\
+		Output X1 & 1 & 1 & 2.8 & 10.1 \\
+		Output X2 & 1 & 1 & 8.2 & 101.2 \\
+		Dual Objective & -2.51e-09 & 0 & 3.48 & 84.72 \\
+		Primal Objective & 3.27e-15 & -3.13e-08 & 4.75 & 89.2 \\
+		\hline
+	\end{tabu}
+\end{center}
+
+It's clear from the iterations that the global minimum isn't always obtained, signaling that the optimisation process got stuck in some local minima. However, the optimum value for the equation can be found at \texttt{x1 = 1} and \texttt{x2 = 1}.
+
+
 \subsection{Problem 3}
+
+The following problem entailed solving for the equation below:
+
+\begin{equation*}
+\begin{aligned}
+& \underset{x_1,x_2}{\text{min}}
+& & (1 - x_1)^2 + 100(x_2 - x_1^2)^2  \\ 
+\end{aligned}
+\end{equation*}
+
+The above equation can be modeled as the following in the AMPL solver:
+
+\begin{verbatim}
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+var x1 >= 0;
+var x2 >= 0;
+let x1 := 1;   # tested for different values of x1
+let x2 := -1;  # tested for different values of x2
+
+minimize f: (1-x1)^2 + 100*(x2-(x1)^2)^2;
+
+solve;
+display x1;
+display x2;
+\end{verbatim}
+
 
 \section{Modeling constrained problems}
 We now focus on modeling some kind of “real” problems.
