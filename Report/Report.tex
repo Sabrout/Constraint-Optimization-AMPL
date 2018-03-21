@@ -499,7 +499,7 @@ display w1;
 display w2;
 \end{verbatim}
 
-\newpage
+
 \noindent
 The .dat file was defined as below:
 
@@ -517,7 +517,7 @@ read {i in 1..n} (x1[i], x2[i], y[i]) < data.csv;
 
 
 
-\begin{table}[]
+\begin{center}[]
 \begin{tabu}{|c|l|l|l|l|l|}
 \hline
 \multirow{2}{*}{Linear Regression}                         & \multirow{2}{*}{Lambda (L)} & \multicolumn{2}{c|}{AMPL} & \multicolumn{2}{c|}{PYTHON} \\ \cline{3-6} 
@@ -532,13 +532,13 @@ Basic                                                      & -                  
 \multicolumn{1}{|l|}{}                                     & 0                           & 0.0866      & 0.0192      & 0.0866       & 0.0192       \\ \cline{2-6} 
 \multicolumn{1}{|l|}{}                                     & 0.1                         & 0.0866      & 0.0192      & 0.0866       & 0.0192       \\ \hline
 \end{tabu}
-\end{table}
+\end{center}
 
 
 
 From the above table we observe that the w1 and w2 values in case of simple regression is the same when solved in AMPL and Python. This is not the case with L1 regression. For some reason the values tend to deviate a bit for different values of Lambda (L). This could be due to different manner in which it's initialized on the python solver as opposed to the AMPL solver. This being said, the same situation isn't witnessed with L2 regression where values of w1 and w2 for different values of L are the same on AMPL and on Python. 
 
- \newpage
+\newpage
 \section{Conclusion}
 The practical session was a huge learning experience as we got to test and understand how exactly would problems in the real life be thought about, formulated and put to the test to arrive at optimality. The session along with the report work gave us a hands on experience on the AMPL solver and its functionality which would definitely server well in our future exploits as data scientists.  
 All in all, the practical session helped broaden our perception on optimization while at the same time securing a deeper understanding of the subject.  
