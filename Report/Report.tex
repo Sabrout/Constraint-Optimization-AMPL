@@ -213,7 +213,7 @@ The following problem entailed solving for the equation below:
 \begin{equation*}
 \begin{aligned}
 & \underset{x_1,x_2}{\text{min}}
-& & (1 - x_1)^2 + 100(x_2 - x_1^2)^2  \\ 
+& & 10 + x_1^2  + x_2^2 - 10(cos 2\pi x_1 + cos 2 \pi x_2) \\ 
 \end{aligned}
 \end{equation*}
 
@@ -223,18 +223,34 @@ The above equation can be modeled as the following in the AMPL solver:
 reset;
 option solver loqo;
 option loqo_options 'iterlim 30 dual', solver loqo;
-var x1 >= 0;
-var x2 >= 0;
-let x1 := 1;   # tested for different values of x1
-let x2 := -1;  # tested for different values of x2
+param pi := 4*atan(1);
+var x1;
+var x2;
+let x1 := 0; # tested for different values of x1
+let x2 := 0; # tested for different values of x2
 
-minimize f: (1-x1)^2 + 100*(x2-(x1)^2)^2;
+minimize f: 10 + x1^2 + x2^2 - 10*(cos(2*pi*x1) + cos(2*pi*x2));
 
 solve;
 display x1;
-display x2;
-\end{verbatim}
+display x2;\end{verbatim}
 
+\begin{center}
+	\begin{tabu} to 0.95\textwidth { |X[c]|X[c]X[c]X[c]X[c]| }
+		\hline
+		Parameters & Iteration 1 & Iteration 2 & Iteration 3 & Iteration 4 \\
+		\hline
+		Initialized X1 & -10 & 0 & 10 & 100 \\
+		Initialized X2  & -10 & 0 & 10 & 100 \\
+		Output X1 & -9.94 & 0 & 9.94 & 87.36 \\
+		Output X2 & -9.94& 0 & 9.94 & 87.36 \\
+		Dual Objective & 188.98 & -10 & 188.98 & 15286.25 \\
+		Primal Objective &188.98 & -10 & 188.98 & 15286.25 \\
+		\hline
+	\end{tabu}
+\end{center}
+
+Different starting points does gives different minimas, signaling that the optimization parameters get stuck at some local minima. From the table above it is observed that as the initializations of \texttt{x1} and \texttt{x2 } move away from zero the global minima is no longer achieved.
 
 \section{Modeling constrained problems}
 We now focus on modeling some kind of “real” problems.
@@ -449,6 +465,52 @@ Optimization  35
 \end{verbatim}
 Hence, the student should dedicate 15\% of his or her time to the Computer Vision course, 30\% to Data Mining, 20\% to Machine Learning and 35\% to the Optimization course. Of course this solution does not guarantee the highest grades possible for a student, it just shows the best possible grades given a limited time frame. 
 \section{Data Analysis}
+
+In this section a linear regression objective function was analyzed using the AMPL solver.  To do so, three regression objective scenarios were considered; simple, with L1 regression and with L2 regression. The minimas for each of these objectives at different initializations were calculated, tablulated and compared with optimization trials conducted within the python frame work.   
+
+
+\begin{verbatim}
+
+# Note : code for all cases are the same, only the objective changes
+# When running the program, please comment out non-targeted objectives 
+
+reset;
+option solver loqo;
+option loqo_options 'iterlim 30 dual', solver loqo;
+
+param n >= 1;
+param x1{1..n};
+param x2{1..n};
+param y{1..n};
+var w1;
+var w2;
+var b;
+param L = 100;
+
+minimize f: sum{i in 1..n} (w1*x1[i] + w2*x2[i] + b - y[i])^2;
+minimize f: sum{i in 1..n} (w1*x1[i] + w2*x2[i] + b - y[i])^2 + L*abs(w1 + w2);
+minimize f: sum{i in 1..n} (w1*x1[i] + w2*x2[i] + b - y[i])^2 + L*(w1^2 + w2^2);
+
+data prob_4_simple.dat;
+solve;
+display w1;
+display w2;
+\end{verbatim}
+ 
+Note: for the data
+
+\begin{verbatim}
+data;
+param n := 10;
+read {i in 1..n} (x1[i], x2[i], y[i]) < data.csv; 
+\end{verbatim}
+
+
+
+
+
+
+
 
 \section{Conclusion}
 
