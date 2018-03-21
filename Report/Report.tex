@@ -41,6 +41,7 @@
 \usepackage{listings}
 \usepackage{subcaption}
 \usepackage{tabu}
+ \usepackage{multirow}
 
 \begin{document}
 
@@ -466,11 +467,12 @@ Optimization  35
 Hence, the student should dedicate 15\% of his or her time to the Computer Vision course, 30\% to Data Mining, 20\% to Machine Learning and 35\% to the Optimization course. Of course this solution does not guarantee the highest grades possible for a student, it just shows the best possible grades given a limited time frame. 
 \section{Data Analysis}
 
-In this section a linear regression objective function was analyzed using the AMPL solver.  To do so, three regression objective scenarios were considered; simple, with L1 regression and with L2 regression. The minimas for each of these objectives at different initializations were calculated, tablulated and compared with optimization trials conducted within the python frame work.   
+In this section a linear regression objective function was analyzed using the AMPL solver.  To do so, three regression objective scenarios were considered; simple, with L1 regression and with L2 regression. The minimas for each of these objectives for different values of lambda (L) were calculated, tablulated and compared with optimization trials conducted within the python frame work.  \newline 
 
+\noindent
+The model was defined as shown in the below:
 
 \begin{verbatim}
-
 # Note : code for all cases are the same, only the objective changes
 # When running the program, please comment out non-targeted objectives 
 
@@ -485,7 +487,7 @@ param y{1..n};
 var w1;
 var w2;
 var b;
-param L = 100;
+param L = 10; # the value can be tuned
 
 minimize f: sum{i in 1..n} (w1*x1[i] + w2*x2[i] + b - y[i])^2;
 minimize f: sum{i in 1..n} (w1*x1[i] + w2*x2[i] + b - y[i])^2 + L*abs(w1 + w2);
@@ -496,22 +498,48 @@ solve;
 display w1;
 display w2;
 \end{verbatim}
- 
-Note: for the data
+
+\newpage
+\noindent
+The .dat file was defined as below:
 
 \begin{verbatim}
+# Note: Please change value of n if number of instances are not equal to 10. 
 data;
 param n := 10;
 read {i in 1..n} (x1[i], x2[i], y[i]) < data.csv; 
 \end{verbatim}
 
 
+\textbf{Note} : The input data must be stored as a .csv file in the same directory in which the solver is running. Also, the model above is defined for only two input features. So the .csv file must consist of two features and a target. \newline
+\textit{The .csv file on which the models were tested can be found on our github repo.} \newline
+ 
 
 
 
+\begin{table}[]
+\begin{tabu}{|c|l|l|l|l|l|}
+\hline
+\multirow{2}{*}{Linear Regression}                         & \multirow{2}{*}{Lambda (L)} & \multicolumn{2}{c|}{AMPL} & \multicolumn{2}{c|}{PYTHON} \\ \cline{3-6} 
+                                                           &                             & w1          & w2          & w1           & w2           \\ \hline
+Basic                                                      & -                           & 0.0866      & 0.0192      & 0.0866       & 0.0192       \\ \hline
+\multirow{4}{*}{with L1 regularizer}                       & 10                          & 0.0756      & -0.0187     & 0            & 0            \\ \cline{2-6} 
+                                                           & 0                           & 0.0866      & 0.0192      & 0.0866       & 0.0192       \\ \cline{2-6} 
+                                                           & 0.1                         & 0.0865      & 0.0188      & 0.0844       & 0.0116       \\ \cline{2-6} 
+                                                           & 0.01                        & 0.0866      & 0.0192      & 0.0864       & 0.0184       \\ \hline
+\multicolumn{1}{|l|}{\multirow{4}{*}{with L2 regularizer}} & 100                         & 0.0622      & 0.0169      & 0.0622       & 0.0169       \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                     & 10                          & 0.0833      & 0.0192      & 0.0833       & 0.0192       \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                     & 0                           & 0.0866      & 0.0192      & 0.0866       & 0.0192       \\ \cline{2-6} 
+\multicolumn{1}{|l|}{}                                     & 0.1                         & 0.0866      & 0.0192      & 0.0866       & 0.0192       \\ \hline
+\end{tabu}
+\end{table}
 
 
 
+From the above table we observe that the w1 and w2 values in case of simple regression is the same when solved in AMPL and Python. This is not the case with L1 regression. For some reason the values tend to deviate a bit for different values of Lambda (L). This could be due to different manner in which it's initialized on the python solver as opposed to the AMPL solver. This being said, the same situation isn't witnessed with L2 regression where values of w1 and w2 for different values of L are the same on AMPL and on Python. 
+
+ 
 \section{Conclusion}
+
 
 \end{document}
